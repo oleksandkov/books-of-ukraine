@@ -1,7 +1,7 @@
 ---
-title: "Event Modeling of Service Programs"
-subtitle: "Decomposing Active Caseload"
-author: "Research & Open Data"
+title: "Exploratory Data Analysis 1"
+subtitle: "EDA 1"
+author: "TBD"
 format:
   html:
     page-layout: full
@@ -20,33 +20,9 @@ editor_options:
 
 # Mission
 
-This document ...
+This document introduces the reader to
 
 # **Definition of Terms**
-
-The history of relationships between people and programs is organized into *episodes of service.* Services can be of three broad types: financial assistance (FS), training (TR), and assessment (AS). ***In this analysis we focus on episodes of financial support***, which have certain unique features:
-
--   The smallest unit of time is one month
-
--   A FS event begins on the first day of the month and ends on the last day of the month (as opposed to TR an AS events which can take place any day of the month).
-
--   Client can receive only on type of support at a time (client_type_code)
-
-We define two type of service episodes:
-
--   **SPELL** – A non-interrupted period of service use, separated from other SPELLs by at least two consecutive months of non-use.
-
--   **SPELL_BIT** – A non-interrupted period of service use, separated from other SPELL_BITs by at least two consecutive months of non-use *or* by a change in client type or household role. In other words, a change in client type or household role terminate the SPELL_BIT
-
-SPELL_BITs make up SPELLs. In many cases, a SPELL consists of a single SPELL_BIT.
-
-Episodes of Financial Support can be decomposed into constituent events:
-
--   **START** – The first day of the month in which the service in this episode is received.
-
--   **EXIT** – The last day of the month in which the service ins this episode is received.
-
--   **STAY** – Any month within the SPELL_BIT that is not a START or EXIT.
 
 ```{r}
 #| code-summary: Reconciles working directory between execution modes
@@ -85,7 +61,7 @@ echo_chunks    <- FALSE #Toggle for debugging.
 message_chunks <- FALSE #Toggle for debugging.
 options(width=100) # number of characters to display in the output (dflt = 80)
 ggplot2::theme_set(ggplot2::theme_bw()) # common theme for all graphs
-read_chunk("./analysis/fs-dynamics/1-scribe.R") #This allows knitr to call
+read_chunk("./analysis/eda-1/eda-1.R") #This allows knitr to call
 ```
 
 # Environment
@@ -142,12 +118,6 @@ read_chunk("./analysis/fs-dynamics/1-scribe.R") #This allows knitr to call
 
 This report operates with the following data objects:
 
-`ds_event` - all episodes of service (FS, TR, AS) for individuals who had at least one engagement with ALSS services between `r target_window_opens` and `r target_window_closes`
-
-`ds0_event` - subset of `ds_event`, limiting the scope to episodes Financial Support and removing any episodes not contained by the boundaries: `r target_window_opens` and `r target_window_closes`
-
-`ds_taxonomy` - standard classification of service episodes for additional ad-hoc grouping, if needed.
-
 ```{r }
 #| label: load-data
 #| code-summary: Load data objects 
@@ -169,7 +139,7 @@ This report operates with the following data objects:
 
 ```
 
-## Inspect `ds0`
+## Inspect starting files
 
 ```{r}
 #| label: inspect-data-0
@@ -177,8 +147,24 @@ This report operates with the following data objects:
 #| code-fold: false
 #| eval: true
 #| cache: true
-ds0_event %>% glimpse()
-# ds0_taxonomy %>% glimpse()
+ds_support %>% glimpse()
+```
+
+```{r}
+#| label: inspect-data-1
+#| code-summary: Inspect contents of the available data tables
+#| code-fold: false
+#| eval: true
+#| cache: true
+```
+
+```{r}
+#| label: inspect-data-2
+#| code-summary: Inspect contents of the available data tables
+#| code-fold: false
+#| eval: true
+#| cache: true
+cat("QMD file has won")
 ```
 
 ## Tweak 1
@@ -199,13 +185,5 @@ ds0_event %>% glimpse()
 #| code-fold: true
 #| eval: true
 #| cache: true
-ds0_event %>% 
-  group_by(program_class1,pc2, program_class3, client_type_code) %>% 
-  summarize(
-    episode_count = n()
-    ,client_count = n_distinct(person_oid)
-    ,.groups = "drop"
-  ) %>% 
-  relocate("program_class3",.after = "client_count") %>% 
-  neat()
+
 ```
