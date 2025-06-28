@@ -47,13 +47,54 @@ if (!fs::dir_exists(prints_folder)) {fs::dir_create(prints_folder)}
 
 # ---- load-data ---------------------------------------------------------------
 
+
+library(readr)
+ds_pub_count <-
+  read_csv("data-private/derived/manipulation/csv/k_t_vidan.csv") %>% 
+  # each xYYYY column must be an integer
+  rename(measure = x) %>% 
+  mutate(across(starts_with("x"), ~ as.integer(.))) 
+
 # ---- tweak-data-0 -------------------------------------
+# ds_pub_count %>% glimpse(0)
+# row 1 contains the total count unique titles
+# row 2 contains the total number of books published
+# rows 3-28 contain counts of copies published by genre
+# row 29-80 contains total counts by oblast
+# rows 81-108 contains total copies published by publisher type
+# now let's tidy this data and create four serparate tibbles
+# 1. ds_totals - total coutns (rows 1-2)
+# 2. ds_genre - counts by genre (rows 3-28)
+# 3. ds_oblast - counts by oblast (rows 29-80)
+# 4. ds_publisher - counts by publisher type (rows 81-108)
+ds_totals <- ds_pub_count %>%
+  slice(1:2) %>%
+  pivot_longer(cols = -c(1), names_to = "year", values_to = "count") %>%
+  mutate(year = str_remove(year, "x") %>% as.integer())
 
-# ---- inspect-data-0 -------------------------------------
+ds_totals %>% glimpse()
+ds_genre <- ds_pub_count %>%
+  slice(3:28) %>%
+  pivot_longer(cols = -c(1), names_to = "year", values_to = "count") %>%
+  mutate(year = str_remove(year, "x") %>% as.integer())
+ds_genre %>% glimpse()
 
-# ---- inspect-data-1 -------------------------------------
+ds_oblast <- ds_pub_count %>%
+  slice(29:80) %>%
+  pivot_longer(cols = -c(1), names_to = "year", values_to = "count") %>%
+  mutate(year = str_remove(year, "x") %>% as.integer())
+ds_oblast %>% glimpse()
 
+ds_publisher_type <- ds_pub_count %>%
+  slice(81:108) %>%
+  pivot_longer(cols = -c(1), names_to = "year", values_to = "count") %>%
+  mutate(year = str_remove(year, "x") %>% as.integer())
+ds_publisher %>% glimpse()
+
+# we now have four tabless, each offerring a different breakdown:
+# total, genre, oblast, and publisher type
 # ---- inspect-data-2 -------------------------------------
 
 # ---- analysis-below -------------------------------------
+
 
