@@ -71,6 +71,7 @@ Desktop.ini
 
 # ---- OS X --------------------------------------------------
 .DS_Store
+<<<<<<< Updated upstream
 
 # ---- Visual Studio Code (text editor) ----------------------
 .vscode/
@@ -133,3 +134,6 @@ analysis/analysis-templatization/README_files/libs/quarto-html/quarto-syntax-hig
 analysis/analysis-templatization/README_files/libs/quarto-html/quarto.js
 analysis/analysis-templatization/README_files/libs/quarto-html/tippy.css
 analysis/analysis-templatization/README_files/libs/quarto-html/tippy.umd.min.js
+=======
+.Rproj.user
+>>>>>>> Stashed changes
