@@ -71,8 +71,8 @@ ds_totals <- ds_pub_count %>%
   slice(1:2) %>%
   pivot_longer(cols = -c(1), names_to = "year", values_to = "count") %>%
   mutate(year = str_remove(year, "x") %>% as.integer())
-
 ds_totals %>% glimpse()
+ 
 ds_genre <- ds_pub_count %>%
   slice(3:28) %>%
   pivot_longer(cols = -c(1), names_to = "year", values_to = "count") %>%
@@ -97,4 +97,40 @@ ds_publisher %>% glimpse()
 
 # ---- analysis-below -------------------------------------
 
+# ----- g1-total-counts ------------------------------------------------
+g1 <- 
+  ds_totals %>% 
+  filter(year >= 2013) %>%
+  ggplot(aes(x = year, y = count, color=measure)) +
+  geom_line() +
+  geom_point()+
+  # the x ticks should be integers
+  scale_x_continuous(breaks = seq(2013, max(ds_totals$year), by = 2)) +
+  # make y-axis labels have comma separators
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Total Counts of Books Published",
+    x = "Year",
+    y = "Count"
+  ) 
+g1
+
+# ----- g2-genre-counts ------------------------------------------------
+ds_genre %>% glimpse()
+g2 <- 
+  ds_genre %>% 
+  filter(year >= 2013) %>%
+  ggplot(aes(x = year, y = count, color=measure, group = measure)) +
+  geom_line() +
+  geom_point()+
+  # the x ticks should be integers
+  scale_x_continuous(breaks = seq(2013, max(ds_totals$year), by = 2)) +
+  # make y-axis labels have comma separators
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Total Counts of Books by Genre",
+    x = "Year",
+    y = "Count"
+  ) 
+g2
 
