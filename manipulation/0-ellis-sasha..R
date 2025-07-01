@@ -279,38 +279,43 @@ rm(df_raw, df_raw_clean, ds, long_number, long_circulation, long_all)
 
 # ---- ds_genre_naclad ----
 
-# Приводимо всі стовпці крім genre до числових (list -> numeric)
+
+library(dplyr)
+
+df3 <- readRDS("data-private/derived/manipulation/naklad_tematic.rds")
+
+
+library(tidyr)
+library(dplyr)
+library(stringr)
+
+genre_col <- names(df3)[1]
+
 df3_fixed <- df3 %>%
-  mutate(across(.cols = -genre, .fns = ~ as.numeric(as.character(.))))
+  mutate(across(-all_of(genre_col), ~ as.numeric(as.character(.))))
 
-# Далі як і раніше
-ds_genre_naclad <- df3_fixed %>%
+df3_long <- df3_fixed %>%
   pivot_longer(
-    cols = -genre,
-    names_to = "year",
-    values_to = "num_titles"
+    cols = -all_of(genre_col),
+    names_to = "yr",
+    values_to = "circulation"
   ) %>%
-  group_by(year, genre) %>%
-  summarise(num_titles = sum(num_titles, na.rm = TRUE), .groups = "drop") %>%
-  pivot_wider(names_from = genre, values_from = num_titles) %>%
-  mutate(measure = "circulation") %>%
-  relocate(year, measure) %>%
-  rowwise() %>%
-  mutate(total_num = sum(c_across(-c(year, measure)), na.rm = TRUE)) %>%
-  ungroup()
+  mutate(
+    yr = as.integer(str_remove(yr, "^x"))
+  )
 
-# Результат
+ds_genre_naclad <- df3_long %>%
+  pivot_wider(
+    names_from = !!genre_col,
+    values_from = "circulation"
+  ) %>%
+  mutate(measure = "circulate") %>%
+  relocate(yr, measure)
+
 ds_genre_naclad
-
-
-
-
-
-
-
-
-
-
+print(names(ds_genre_naclad))
+ds_genre_naclad <- ds_genre_naclad %>%
+  rename("Друк у цілому. Книгознавство. Преса. Поліграфія" = "Друк у цілому. Книгознавство. Преса. Поліграфія")
 
 # ---- ds_genre_num ----
 
@@ -367,7 +372,7 @@ glimpse(ds_genre_num)
 ds_genre_num <- ds_genre_num %>%
   rename_with(~str_replace_all(., "\\n", " "))
 
-saveRDS(ds_genre_num, "data-private/derived/manipulation/ds_genre_num.rds")
+print(names(ds_genre_num))
 
 
 
@@ -438,21 +443,107 @@ needed_cols <- c(
   "Література універсального змісту"
 )
 
-ds_genre_num_0506_filtered <- 
-  ds_genre_num_2 %>% 
-  select("yr", "measure", "Політична і соціально-економічна\nлітература", "Природничо-наукова література", "Технічна література", "Сільськогосподарська література", "Охорона здоров’я. Медична література", "Література з фізичної культури і спорту", "Література з освіти та культура","Друк у цілому. Книгознавство. Преса. \nПоліграфія", "Мистецтво. Мистецтвознавство", "Література по філологічним наукам", "Художня література", "Дитяча література", "Література універсального змісту")
+ds_genre_num_0506_filtered <- ds_genre_num_2 %>%
+  select(
+    "yr",
+    "measure",
+    "Політична і соціально-економічна\nлітература, у т.ч:",
+    "Природничо-наукова література, у т.ч.:",
+    "Технічна література, у т.ч.:",
+    "Сільськогосподарська література, у т.ч.:",
+    "Охорона здоров’я. Медична література",
+    "Література з фізичної культури і спорту",
+    "Література з освіти та культура, у т.ч.:",
+    "Друк у цілому. Книгознавство. Преса. \nПоліграфія, у т.ч.:",
+    "Мистецтво. Мистецтвознавство, у т.ч.:",
+    "Література по філологічним наукам, у т.ч.:",
+    "Художня література, у т.ч.:",
+    "Дитяча література, у т.ч.:",
+    "Література універсального змісту"
+  )
 
-ds_genre_num_0506_filtered <- ds_genre_num_2 %>% 
-  select("yr", "measure", "Політична і соціально-економічна\nлітература", "Природничо-наукова література", 
-         "Технічна література", "Сільськогосподарська література", "Охорона здоров’я. Медична література", 
-         "Література з фізичної культури і спорту", "Література з освіти та культура",
-         "Друк у цілому. Книгознавство. Преса. \nПоліграфія", "Мистецтво. Мистецтвознавство", 
-         "Література по філологічним наукам", "Художня література", "Дитяча література", 
-         "Література універсального змісту") %>%
-  rename_with(~str_replace_all(., "\\n", " "))
+names(ds_genre_num_0506_filtered) <- names(ds_genre_num_0506_filtered) %>%
+  str_replace_all("\\n", " ") %>%
+  str_squish() %>%
+  str_replace_all("  +", " ")
 
-saveRDS(ds_genre_num_0506_filtered, "data-private/derived/manipulation/ds_genre_num_0505_filtered.rds")
+print(names(ds_genre_num_0506_filtered))
 
+ds_genre_num_0506_filtered_1 <- ds_genre_num_0506_filtered %>%
+  rename(
+    "Політична і соціально-економічна література" = "Політична і соціально-економічна література, у т.ч:",
+    "Друк у цілому. Книгознавство. Преса. Поліграфія" = "Друк у цілому. Книгознавство. Преса. Поліграфія, у т.ч.:",
+    "Природничо-наукова література" = "Природничо-наукова література, у т.ч.:" 
+    , "Технічна література" = "Технічна література, у т.ч.:" 
+    , "Сільськогосподарська література" = "Сільськогосподарська література, у т.ч.:"
+    , "Охорона здоров'я. Медична література" = "Охорона здоров’я. Медична література"
+    , "Література з фізичної культури і спорту" = "Література з фізичної культури і спорту"
+    , "Література з освіти і культури" = "Література з освіти та культура, у т.ч.:"
+    , "Друк у цілому. Книгознавство. Преса Поліграфія" = "Друк у цілому. Книгознавство. Преса. Поліграфія, у т.ч.:"
+    , "Мистецтво. Мистецтвознавство" = "Мистецтво. Мистецтвознавство, у т.ч.:"
+    , "Література з філологічних наук" = "Література по філологічним наукам, у т.ч.:"
+    , "Художня література. Фольклор" = "Художня література, у т.ч.:"
+    , "Дитяча література" = "Дитяча література, у т.ч.:"
+    , "Література універсального змісту" = "Література універсального змісту"
+  )
+print(names(ds_genre_num_0506_filtered_1))
+
+
+
+which(str_detect(names(ds_genre_num_2), "Друк у цілому."))
+names(ds_genre_num_2)[which(str_detect(names(ds_genre_num_2), "Друк у цілому."))]
 
 # ---- ds_genre_num_whole----
 
+
+
+# 2. Вибираємо лише 2005 і 2006 з додаткового файлу
+ds_0506 <- ds_genre_num_0506_filtered_1 %>% filter(yr %in% c(2005, 2006))
+
+# 3. Видаляємо ці роки з основної таблиці
+ds_genre_num_no_0506 <- ds_genre_num %>% filter(!yr %in% c(2005, 2006))
+
+# 4. Об'єднуємо
+ds_genre_number <- bind_rows(ds_genre_num_no_0506, ds_0506) %>% arrange(yr)
+ds_genre_number <- ds_genre_number %>%
+  rename("Друк у цілому. Книгознавство. Преса. Поліграфія" = "Друк у цілому. Книгознавство. Преса Поліграфія")
+
+
+
+# ---- ds_genre ----
+
+long_naclad <- ds_genre_naclad %>%
+  pivot_longer(
+    cols = -c(yr, measure),
+    names_to = "genre",
+    values_to = "value"
+  )
+
+long_number <- ds_genre_number %>%
+  pivot_longer(
+    cols = -c(yr, measure),
+    names_to = "genre",
+    values_to = "value"
+  )
+
+# 3. Об'єднати
+combined_long <- bind_rows(long_naclad, long_number)
+
+# 4. wide: кожен жанр — колонка
+ds_genre <- combined_long %>%
+  pivot_wider(
+    id_cols = c(yr, measure),
+    names_from = genre,
+    values_from = value
+  ) %>%
+  arrange(yr, measure)
+
+print(names(ds_genre_naclad))
+print(names(ds_genre_number))
+
+saveRDS(ds_genre, "data-private/derived/manipulation/ds_genre.rds")
+
+
+identical(names(ds_genre_naclad), names(ds_genre_number))
+
+rm(long_naclad, long_number, combined_long, combined_wide, ds_genre_number, ds_genre_naclad, df, df_fixed, df_long, df3, df3_fixed, df3_long, ds_0506, df_genre_0506, ds_genre_num, ds_genre_num_0506_filtered, ds_genre_num_0506_filtered_1, ds_genre_num_no_0506, ds_genre_num_2, ds_genre_0506)
