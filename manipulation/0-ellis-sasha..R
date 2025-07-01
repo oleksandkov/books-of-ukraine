@@ -21,6 +21,9 @@ library(scales)    # format
 library(broom)     # for model
 library(emmeans)   # for interpreting model results
 library(ggalluvial)
+library(janitor)
+library(openxlsx)
+library(googlesheets4)
 # -- 2.Import only certain functions of a package into the search path.
 # import::from("magrittr", "%>%")
 # -- 3. Verify these packages are available on the machine, but their functions need to be qualified
@@ -189,20 +192,15 @@ cat("CSV файли збережено у:", csv_folder, "\n")
 cat("\n=== ЗАВЕРШЕНО ===\n")
 cat("Всі дані успішно завантажено та збережено!\n")
 
-# ---- ds_year create ----- 
+# ----------------------------------------------------------------- DS_YEAR ----------------------------
+## ------ ds_year 1 --------
 
 
-
-library(tidyverse)
-
-# 1. Зчитати початкові дані
 df_raw <- readRDS("data-private/derived/manipulation/k_t_vidan.rds")
 
-# 2. Примусово перетворити всі колонки (крім першої) на character
 df_raw_clean <- df_raw %>%
   mutate(across(-1, ~ as.character(.)))
 
-# 3. Зібрати у довгий формат
 ds_year <- df_raw_clean %>%
   pivot_longer(
     cols = -1,
@@ -218,23 +216,20 @@ ds_year <- df_raw_clean %>%
   select(yr, measure, value) %>%
   arrange(yr, measure)
 
-# 4. Перевірити
-print(ds_year)
+## ------ ds_year 2 --------
+rm(df_raw, df_raw_clean)
+## ------ ds_year 3 --------
+saveRDS(ds_year, "data-private/derived/manipulation/ds_year.rds")
 
-# ---- ds_language create ----
+# ----------------------------------------------------------------- DS_LANGUAGE ------------------------
+## ------ ds_language 1 ------
 ds <- readRDS("data-private/derived/manipulation/movi_narodu_svitu.rds")
 
-# Припустимо, що стовпці мають імена на кшталт:
-# "x2018", "x_2", "x2019", "x_3", ..., і мова в колонці "mova"
+cols_number <- grep("^x\\d{4}$", names(ds), value = TRUE)     
+cols_circulation <- grep("^x_\\d+$", names(ds), value = TRUE) 
 
-# 1. Знайдемо стовпці з назвами років і накладами
-cols_number <- grep("^x\\d{4}$", names(ds), value = TRUE)     # Наприклад: x2018, x2019
-cols_circulation <- grep("^x_\\d+$", names(ds), value = TRUE) # Наприклад: x_2, x_3
+ds$mova <- as.character(ds$x)  
 
-# 2. Додамо ідентифікатор мови (рядкова назва)
-ds$mova <- as.character(ds$x)  # або інша назва, яку ти побачиш
-
-# 3. Перетворимо у довгий формат окремо:
 long_number <- ds %>%
   select(mova, all_of(cols_number)) %>%
   pivot_longer(
@@ -255,14 +250,12 @@ long_circulation <- ds %>%
   ) %>%
   mutate(
     measure = "circulation",
-    yr = as.character(as.numeric(temp) + 2016)  # Якщо x_2 — це 2018, тоді +2016
+    yr = as.character(as.numeric(temp) + 2016)  
   ) %>%
   select(-temp)
 
-# 4. Об'єднуємо обидва
 long_all <- bind_rows(long_number, long_circulation)
 
-# 5. Перетворюємо в широку форму: колонки — мови
 ds_language <- long_all %>%
   pivot_wider(
     names_from = mova,
@@ -270,25 +263,21 @@ ds_language <- long_all %>%
   ) %>%
   arrange(yr, measure)
 
-# Результат:
-View(ds_language)
-
+## ------ ds_language 2 ------
 
 rm(df_raw, df_raw_clean, ds, long_number, long_circulation, long_all)
 
 
-# ---- ds_genre_naclad ----
+## ------ ds_language 3 -----
+saveRDS(ds_language, "data-private/derived/manipulation/ds_language.rds")
 
-
-library(dplyr)
+# ------------------------------------------------------------------ DS_GENRE ---------------------------
+## ------- ds_genre_naclad ----
 
 df3 <- readRDS("data-private/derived/manipulation/naklad_tematic.rds")
-
-
-library(tidyr)
-library(dplyr)
-library(stringr)
-
+df3 <- df3 %>%
+  mutate(x2010 = as.numeric(gsub("\\s+", "", as.character(x2010))))
+df3$x2010[10] <- 1045.6
 genre_col <- names(df3)[1]
 
 df3_fixed <- df3 %>%
@@ -315,31 +304,26 @@ ds_genre_naclad <- df3_long %>%
 ds_genre_naclad
 print(names(ds_genre_naclad))
 ds_genre_naclad <- ds_genre_naclad %>%
-  rename("Друк у цілому. Книгознавство. Преса. Поліграфія" = "Друк у цілому. Книгознавство. Преса. Поліграфія")
+rename("Друк у цілому. Книгознавство. Преса. Поліграфія" = "Друк у цілому. Книгознавство. Преса. Поліграфія")
 
-# ---- ds_genre_num ----
+## ------- ds_genre_num ----
 
-library(dplyr)
-library(tidyr)
-library(janitor)
-library(stringr)
 
-# 1. Завантаження
 df <- readRDS("data-private/derived/manipulation/tematicni_rozdili.rds")
 
-# 2. Витягуємо перший рядок як роки
+
 years <- as.character(unlist(df[1, -1]))
 new_names <- c("genre", years)
 
-# 3. Видаляємо перший рядок і оновлюємо заголовки
+
 df_fixed <- df[-1, ]
 colnames(df_fixed) <- new_names
 
-# 4. Приводимо всі стовпці, крім genre, до character
+
 df_fixed <- df_fixed %>%
   mutate(across(-genre, as.character))
 
-# 5. Перехід у long-формат
+
 df_long <- df_fixed %>%
   mutate(genre = as.character(genre)) %>%
   pivot_longer(
@@ -348,7 +332,7 @@ df_long <- df_fixed %>%
     values_to = "value_raw"
   )
 
-# 6. Додавання measure + чистка значень
+
 df_long <- df_long %>%
   mutate(
     yr = as.integer(yr),
@@ -356,7 +340,7 @@ df_long <- df_long %>%
     measure = "number of titles"
   )
 
-# 7. Перехід у wide-формат
+
 ds_genre_num <- df_long %>%
   select(yr, measure, genre, value) %>%
   pivot_wider(
@@ -365,41 +349,30 @@ ds_genre_num <- df_long %>%
   ) %>%
   arrange(yr)
 
-# 8. Перевірка
-glimpse(ds_genre_num)
-
 
 ds_genre_num <- ds_genre_num %>%
   rename_with(~str_replace_all(., "\\n", " "))
 
-print(names(ds_genre_num))
+## ------- ds_genre_num_0506 ---- 
 
-
-
-# ---- ds_genre_num_0506 ---- 
-
-library(dplyr)
-library(tidyr)
-library(janitor)
-library(stringr)
 
 
 df <- readRDS("data-private/derived/manipulation/tematicni_rozdili_05_06.rds") %>%
   clean_names()
 
-# 2. Витягуємо роки з першого рядка (усі крім першої колонки)
+
 years <- as.character(unlist(df[1, -1]))
 new_names <- c("genre", years)
 
-# 3. Видаляємо перший рядок і призначаємо нові імена колонок
+
 df_fixed <- df[-1, ]
 colnames(df_fixed) <- new_names
 
-# 4. Приводимо всі значення до character
+
 df_fixed <- df_fixed %>%
   mutate(across(-genre, as.character))
 
-# 5. Перехід у long-формат
+
 df_long <- df_fixed %>%
   mutate(genre = as.character(genre)) %>%
   pivot_longer(
@@ -413,7 +386,7 @@ df_long <- df_fixed %>%
     measure = "number of titles"
   )
 
-# 6. Перехід у wide-формат
+
 ds_genre_0506 <- df_long %>%
   select(yr, measure, genre, value) %>%
   pivot_wider(
@@ -422,26 +395,9 @@ ds_genre_0506 <- df_long %>%
   ) %>%
   arrange(yr)
 
-# 7. Перевірка
 ds_genre_num_2 <- ds_genre_0506 %>%
   mutate(yr = c(2005, 2006))
 glimpse(ds_genre_num_2)
-
-needed_cols <- c(
-  "Політична і соціально-економічна література",
-  "Природничо-наукова література",
-  "Технічна література",
-  "Сільськогосподарська література.",
-  "Охорона здоров’я. Медична література",
-  "Література з фізичної культури і спорту",
-  "Література з освіти та культури",
-  "Друк у цілому. Книгознавство. Преса. Поліграфія",
-  "Мистецтво. Мистецтвознавство",
-  "Література по філологічним наукам",
-  "Художня література",
-  "Дитяча література",
-  "Література універсального змісту"
-)
 
 ds_genre_num_0506_filtered <- ds_genre_num_2 %>%
   select(
@@ -486,31 +442,21 @@ ds_genre_num_0506_filtered_1 <- ds_genre_num_0506_filtered %>%
     , "Дитяча література" = "Дитяча література, у т.ч.:"
     , "Література універсального змісту" = "Література універсального змісту"
   )
-print(names(ds_genre_num_0506_filtered_1))
+
+## ------- ds_genre_num_whole----
 
 
-
-which(str_detect(names(ds_genre_num_2), "Друк у цілому."))
-names(ds_genre_num_2)[which(str_detect(names(ds_genre_num_2), "Друк у цілому."))]
-
-# ---- ds_genre_num_whole----
-
-
-
-# 2. Вибираємо лише 2005 і 2006 з додаткового файлу
 ds_0506 <- ds_genre_num_0506_filtered_1 %>% filter(yr %in% c(2005, 2006))
 
-# 3. Видаляємо ці роки з основної таблиці
 ds_genre_num_no_0506 <- ds_genre_num %>% filter(!yr %in% c(2005, 2006))
 
-# 4. Об'єднуємо
 ds_genre_number <- bind_rows(ds_genre_num_no_0506, ds_0506) %>% arrange(yr)
 ds_genre_number <- ds_genre_number %>%
   rename("Друк у цілому. Книгознавство. Преса. Поліграфія" = "Друк у цілому. Книгознавство. Преса Поліграфія")
 
 
 
-# ---- ds_genre ----
+## ------- ds_genre ----
 
 long_naclad <- ds_genre_naclad %>%
   pivot_longer(
@@ -526,10 +472,10 @@ long_number <- ds_genre_number %>%
     values_to = "value"
   )
 
-# 3. Об'єднати
+
 combined_long <- bind_rows(long_naclad, long_number)
 
-# 4. wide: кожен жанр — колонка
+
 ds_genre <- combined_long %>%
   pivot_wider(
     id_cols = c(yr, measure),
@@ -538,12 +484,229 @@ ds_genre <- combined_long %>%
   ) %>%
   arrange(yr, measure)
 
-print(names(ds_genre_naclad))
-print(names(ds_genre_number))
 
+
+
+## ------- ds_genre_rm -----------
+rm(long_naclad, long_number, combined_long, combined_wide, ds_genre_number, ds_genre_naclad, df, df_fixed, df_long, df3, df3_fixed, df3_long, ds_0506, df_genre_0506, ds_genre_num, ds_genre_num_0506_filtered, ds_genre_num_0506_filtered_1, ds_genre_num_no_0506, ds_genre_num_2, ds_genre_0506)
+## ------- save ds_genre ----------
 saveRDS(ds_genre, "data-private/derived/manipulation/ds_genre.rds")
 
+#--------------------------------------------------------------------- DS_PUBTYPE --------------------
+## ----- ds_pubtype 1 -------
+df <- readRDS("data-private/derived/manipulation/arkus15.rds")
 
-identical(names(ds_genre_naclad), names(ds_genre_number))
+df_cir <- df %>%
+  mutate(measure = "circulate") %>%
+  relocate(measure, .after = 1)  %>% 
+  rename(yr = x)
+df_cir <- df_cir %>% 
+  rename(
+    "Наукові видання" = "naukovi_vidanna"
+    , "Науково-популярні видання для дорослих" = "naukovo_popularni_vidanna_dla_doroslih"
+    , "Нормативні та виробничо-практичні видання" = "normativni_ta_virobnico_prakticni_vidanna"
+    , "Офіційні видання" = "oficijni_vidanna"
+    , "Громадсько-політичні видання" = "gromads_ko_politicni_vidanna"
+    , "Навчальні та методичні видання" = "navcal_ni_ta_metodicni_vidanna"
+    , "Літературно-художні видання для дорослих" = "literaturno_hudozni_vidanna_dla_doroslih"
+    , "Видання для дітей та юнацтва" = "vidanna_dla_ditej_ta_unactva"
+    , "Довідкові видання" = "dovidkovi_vidanna"
+    , "Інформаційні видання" = "informacijni_vidanna"
+    , "Бібліографічні видання" = "bibliograficni_vidanna"
+    , "Видання для організації дозвілля" = "vidanna_dla_organizacii_dozvilla"
+    , "Рекламні видання" = "reklamni_vidanna"
+    , "Література релігійного змісту" = "literatura_religijnogo_zmistu"
+  )
 
-rm(long_naclad, long_number, combined_long, combined_wide, ds_genre_number, ds_genre_naclad, df, df_fixed, df_long, df3, df3_fixed, df3_long, ds_0506, df_genre_0506, ds_genre_num, ds_genre_num_0506_filtered, ds_genre_num_0506_filtered_1, ds_genre_num_no_0506, ds_genre_num_2, ds_genre_0506)
+## ----- ds_pubtype 2 -------
+
+df_num <- cil_ovi_priznacenna %>% 
+  slice(-1) %>%                              
+  mutate(measure = "number of titles") %>%   
+  relocate(measure, .after = 1) 
+
+year_cols <- grep("^x\\d{4}$", names(df_num), value = TRUE)
+
+
+df_num <- df_num %>%
+  mutate(across(all_of(year_cols), ~as.numeric(gsub("\\s+", "", as.character(.)))))
+
+df_long <- df_num %>%
+  pivot_longer(
+    cols = -c(x, measure),   
+    names_to = "yr",
+    names_prefix = "x",
+    values_to = "value"
+  ) %>%
+  select(x, measure, yr, value) %>%
+  mutate(yr = as.integer(yr))
+
+
+df_number  <- df_long %>%
+  select(yr, measure, x, value) %>%
+  pivot_wider(
+    names_from = x, 
+    values_from = value
+  ) %>%
+  arrange(yr) %>%
+  relocate(measure, .after = yr)
+
+## ----- ds_pubtype 3 -------
+
+common_cols <- intersect(names(df_cir), names(df_number))
+df_cir <- df_cir %>% select(all_of(common_cols))
+df_number <- df_number %>% select(all_of(common_cols))
+ds_pubtype <- bind_rows(df_cir, df_number) %>% arrange(yr, measure)
+
+## ----- ds_pubtype 4 ----- 
+
+rm(df_number, df_cir, common_cols, df_long, df_num, year_cols, df)
+## ----- ds_pubtype 5 ----- 
+saveRDS(ds_pubtype, "data-private/derived/manipulation/ds_pubtype.rds")
+
+# --------------------------------------------------------------------- DS_AREA -----------------------
+## ----- ds_area 1 -------
+df <- teritorii %>% 
+  slice(-1) 
+
+year_cols <- grep("^x\\d{4}$", names(df), value = TRUE)
+
+df <- df %>%
+  mutate(across(x2007:x2010, ~as.numeric(gsub("\\s+", "", as.character(.))))) %>% 
+  slice(-27:-37) 
+
+
+df_long <- df %>%
+  pivot_longer(
+    cols = -x,           # pivot all columns except 'x'
+    names_to = "yr",
+    names_prefix = "x",
+    values_to = "value"
+  ) %>%
+  mutate(
+    yr = as.integer(yr),
+    measure = "number of titles"
+  )
+
+ds_area_num <- df_long %>%
+  select(yr, measure, x, value) %>%
+  pivot_wider(
+    names_from = x,
+    values_from = value
+  ) %>%
+  arrange(yr) %>%
+  relocate(measure, .after = yr)
+
+## ----- ds_area 2 -------
+
+terir_naklad <- terir_naklad %>% 
+  select(-x2025:-x2027)
+
+terir_naklad_long <- terir_naklad %>%
+  pivot_longer(
+    cols = -x,              # all columns except "x" (area)
+    names_to = "yr",
+    names_prefix = "x",
+    values_to = "value"
+  ) %>%
+  mutate(yr = as.integer(yr))
+
+ds_area_cir <- terir_naklad_long %>%
+  select(yr, x, value) %>%
+  pivot_wider(
+    names_from = x,
+    values_from = value
+  ) %>%
+  arrange(yr) %>% mutate(measure = "circulation") %>%
+  relocate(measure, .after = yr)
+
+## ----- ds_area 3 -------
+ds_area <- bind_rows(ds_area_num, ds_area_cir) %>%
+  arrange(yr, measure)
+## ----- ds_area 4 -------
+rm(ds_area_cir, terir_naklad_long, ds_area_num, df_long, df, year_cols, ds_area_num)
+## ----- ds_area 5 -------
+saveRDS(ds_area, "data-private/derived/manipulation/ds_area.rds")
+
+
+
+# ---------------------------------------------------------------------- DS_UKR_RUS -----------------------
+## ----- ds_ukr_rus 1 ------
+df <- movi  %>% 
+  slice(-c(3,6,7)) %>%
+  mutate(
+    measure = case_when(
+      x %in% c("ukr", "rus") ~ "number of titles",
+      x %in% c("накл. укр.", "накл. рус.") ~ "circulation",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  relocate(measure, .after = 1) %>% 
+  rename(yr = x)
+
+df_long <- movi %>%
+  slice(-c(3,6,7)) %>%
+  pivot_longer(
+    cols = -x,           # this is the important fix!
+    names_to = "yr",
+    names_prefix = "x",
+    values_to = "value"
+  )
+
+
+df_long <- df_long %>%
+  mutate(
+    measure = case_when(
+      x %in% c("ukr", "rus") ~ "number of titles",
+      x %in% c("накл. укр.", "накл. рус.") ~ "circulation",
+      TRUE ~ NA_character_
+    ),
+    lang = case_when(
+      x %in% c("ukr", "накл. укр.") ~ "ukr",
+      x %in% c("rus", "накл. рус.") ~ "rus",
+      TRUE ~ NA_character_
+    )
+  )
+
+df_wide <- df_long %>%
+  filter(!is.na(measure)) %>%
+  select(yr, measure, lang, value) %>%
+  pivot_wider(
+    names_from = lang,
+    values_from = value
+  ) %>%
+  arrange(yr, measure)
+
+
+## ----- ds_ukr_rus 2------
+
+df_perc <- df_wide %>%
+  filter(measure == "circulation") %>%
+  mutate(
+    ukr = as.numeric(ukr),
+    rus = as.numeric(rus),
+    sum_ = ukr + rus,
+    ukr = if_else(sum_ > 0, round(100 * ukr / sum_, 2), NA_real_),
+    rus = if_else(sum_ > 0, round(100 * rus / sum_, 2), NA_real_),
+    measure = "Percentage to RUS & UKR"
+  ) %>%
+  select(-sum_)
+
+ds_ukr_rus <- bind_rows(df_wide, df_perc) %>%
+  arrange(yr, measure)
+## ----- ds_ukr_rus 3  ------
+rm(df_perc, df_wide, df_long, df)
+## ----- ds_ukr_rus 4  ------
+saveRDS(ds_ukr_rus, "data-private/derived/manipulation/ds_ukr_rus.rds")
+
+
+# ---------------------------------------------------------------------- Converting to Spreadsheets ----------
+sheet_url <- "https://docs.google.com/spreadsheets/d/1OOKeZnMFEAzHyr_M51zaOe76uv1yuqNmveHXSKpeqpo/edit?gid=0#gid=0"
+sheet_write(ds_area, ss = sheet_url, sheet = "ds_area")
+sheet_write(ss = sheet_url, data = ds_genre, sheet = "ds_genre")
+sheet_write(ss = sheet_url, data = ds_language, sheet = "ds_language")
+sheet_write(ss = sheet_url, data = ds_pubtype, sheet = "ds_pubtype")
+sheet_write(ss = sheet_url, data = ds_year, sheet = "ds_year")
+sheet_write(ss = sheet_url, data = ds_ukr_rus, sheet = "ds_ukr_rus")
+
+
