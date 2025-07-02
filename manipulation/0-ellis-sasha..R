@@ -743,4 +743,3 @@ sheet_write(ss = sheet_url, data = ds_pubtype, sheet = "ds_pubtype")
 sheet_write(ss = sheet_url, data = ds_year, sheet = "ds_year")
 sheet_write(ss = sheet_url, data = ds_ukr_rus, sheet = "ds_ukr_rus")
 
-
