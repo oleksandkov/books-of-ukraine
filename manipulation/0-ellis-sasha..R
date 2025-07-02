@@ -197,7 +197,7 @@ cat("Всі дані успішно завантажено та збережен
 
 
 df_raw <- readRDS("data-private/derived/manipulation/k_t_vidan.rds")
-
+                
 df_raw_clean <- df_raw %>%
   mutate(across(-1, ~ as.character(.)))
 
@@ -210,11 +210,27 @@ ds_year <- df_raw_clean %>%
   mutate(
     yr = as.integer(str_remove(yr, "^x")),
     value_clean = str_remove_all(value_raw, " "),
-    measure = if_else(str_detect(value_clean, "\\."), "circulation", "number of titles"),
     value = as.numeric(value_clean)
   ) %>%
+  group_by(yr) %>%
+  mutate(
+    measure = case_when(
+      row_number() == 1 ~ "copy_count",
+      row_number() == 2 ~ "title_count",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  ungroup() %>%
   select(yr, measure, value) %>%
-  arrange(yr, measure)
+  arrange(yr, measure) %>% 
+  mutate(
+    measure = case_when(
+      measure == "copy_count" ~ "title_count",
+      measure == "title_count" ~ "copy_count",
+      TRUE ~ measure
+    )
+  )
+
 
 ## ------ ds_year 2 --------
 rm(df_raw, df_raw_clean)
@@ -238,7 +254,7 @@ long_number <- ds %>%
     names_prefix = "x",
     values_to = "value"
   ) %>%
-  mutate(measure = "number of titles")
+  mutate(measure = "title_count")
 
 long_circulation <- ds %>%
   select(mova, all_of(cols_circulation)) %>%
@@ -249,7 +265,7 @@ long_circulation <- ds %>%
     values_to = "value"
   ) %>%
   mutate(
-    measure = "circulation",
+    measure = "copy_count",
     yr = as.character(as.numeric(temp) + 2016)  
   ) %>%
   select(-temp)
@@ -287,7 +303,7 @@ df3_long <- df3_fixed %>%
   pivot_longer(
     cols = -all_of(genre_col),
     names_to = "yr",
-    values_to = "circulation"
+    values_to = "copy_count"
   ) %>%
   mutate(
     yr = as.integer(str_remove(yr, "^x"))
@@ -296,9 +312,9 @@ df3_long <- df3_fixed %>%
 ds_genre_naclad <- df3_long %>%
   pivot_wider(
     names_from = !!genre_col,
-    values_from = "circulation"
+    values_from = "copy_count"
   ) %>%
-  mutate(measure = "circulate") %>%
+  mutate(measure = "copy_count") %>%
   relocate(yr, measure)
 
 ds_genre_naclad
@@ -337,7 +353,7 @@ df_long <- df_long %>%
   mutate(
     yr = as.integer(yr),
     value = as.numeric(str_remove_all(value_raw, " ")),
-    measure = "number of titles"
+    measure = "title_count"
   )
 
 
@@ -383,7 +399,7 @@ df_long <- df_fixed %>%
   mutate(
     yr = as.integer(str_extract(yr, "\\d{4}")),  # Витягуємо саме 2005/2006
     value = as.numeric(str_remove_all(value_raw, " ")),
-    measure = "number of titles"
+    measure = "title_count"
   )
 
 
@@ -497,7 +513,7 @@ saveRDS(ds_genre, "data-private/derived/manipulation/ds_genre.rds")
 df <- readRDS("data-private/derived/manipulation/arkus15.rds")
 
 df_cir <- df %>%
-  mutate(measure = "circulate") %>%
+  mutate(measure = "copy_count") %>%
   relocate(measure, .after = 1)  %>% 
   rename(yr = x)
 df_cir <- df_cir %>% 
@@ -522,7 +538,7 @@ df_cir <- df_cir %>%
 
 df_num <- cil_ovi_priznacenna %>% 
   slice(-1) %>%                              
-  mutate(measure = "number of titles") %>%   
+  mutate(measure = "title_count") %>%   
   relocate(measure, .after = 1) 
 
 year_cols <- grep("^x\\d{4}$", names(df_num), value = TRUE)
@@ -585,7 +601,7 @@ df_long <- df %>%
   ) %>%
   mutate(
     yr = as.integer(yr),
-    measure = "number of titles"
+    measure = "title_count"
   )
 
 ds_area_num <- df_long %>%
@@ -617,16 +633,16 @@ ds_area_cir <- terir_naklad_long %>%
     names_from = x,
     values_from = value
   ) %>%
-  arrange(yr) %>% mutate(measure = "circulation") %>%
+  arrange(yr) %>% mutate(measure = "copy_count") %>%
   relocate(measure, .after = yr)
 
 ## ----- ds_area 3 -------
-ds_area <- bind_rows(ds_area_num, ds_area_cir) %>%
+ds_geography <- bind_rows(ds_area_num, ds_area_cir) %>%
   arrange(yr, measure)
 ## ----- ds_area 4 -------
 rm(ds_area_cir, terir_naklad_long, ds_area_num, df_long, df, year_cols, ds_area_num)
 ## ----- ds_area 5 -------
-saveRDS(ds_area, "data-private/derived/manipulation/ds_area.rds")
+saveRDS(ds_geography, "data-private/derived/manipulation/ds_geography.rds")
 
 
 
@@ -636,8 +652,8 @@ df <- movi  %>%
   slice(-c(3,6,7)) %>%
   mutate(
     measure = case_when(
-      x %in% c("ukr", "rus") ~ "number of titles",
-      x %in% c("накл. укр.", "накл. рус.") ~ "circulation",
+      x %in% c("ukr", "rus") ~ "title_count",
+      x %in% c("накл. укр.", "накл. рус.") ~ "copy_count",
       TRUE ~ NA_character_
     )
   ) %>%
@@ -657,8 +673,8 @@ df_long <- movi %>%
 df_long <- df_long %>%
   mutate(
     measure = case_when(
-      x %in% c("ukr", "rus") ~ "number of titles",
-      x %in% c("накл. укр.", "накл. рус.") ~ "circulation",
+      x %in% c("ukr", "rus") ~ "title_count",
+      x %in% c("накл. укр.", "накл. рус.") ~ "copy_count",
       TRUE ~ NA_character_
     ),
     lang = case_when(
@@ -681,19 +697,37 @@ df_wide <- df_long %>%
 ## ----- ds_ukr_rus 2------
 
 df_perc <- df_wide %>%
-  filter(measure == "circulation") %>%
+  filter(measure == "copy_count") %>%
   mutate(
     ukr = as.numeric(ukr),
     rus = as.numeric(rus),
     sum_ = ukr + rus,
     ukr = if_else(sum_ > 0, round(100 * ukr / sum_, 2), NA_real_),
     rus = if_else(sum_ > 0, round(100 * rus / sum_, 2), NA_real_),
-    measure = "Percentage to RUS & UKR"
+    measure = "Percen_ukr"
   ) %>%
   select(-sum_)
 
 ds_ukr_rus <- bind_rows(df_wide, df_perc) %>%
   arrange(yr, measure)
+
+ds_ukr_rus <- df_wide %>%
+  filter(measure %in% c("title_count", "copy_count")) %>%
+  mutate(
+    ukr = as.numeric(ukr),
+    rus = as.numeric(rus),
+    perc_ukr = if_else(
+      ukr + rus > 0,
+      round(100 * ukr / (ukr + rus), 2),
+      NA_real_
+    ),
+    perc_rus = if_else(
+      ukr + rus > 0,
+      round(100 * rus / (ukr + rus), 2),
+      NA_real_
+    )
+  )
+
 ## ----- ds_ukr_rus 3  ------
 rm(df_perc, df_wide, df_long, df)
 ## ----- ds_ukr_rus 4  ------
@@ -702,7 +736,7 @@ saveRDS(ds_ukr_rus, "data-private/derived/manipulation/ds_ukr_rus.rds")
 
 # ---------------------------------------------------------------------- Converting to Spreadsheets ----------
 sheet_url <- "https://docs.google.com/spreadsheets/d/1OOKeZnMFEAzHyr_M51zaOe76uv1yuqNmveHXSKpeqpo/edit?gid=0#gid=0"
-sheet_write(ds_area, ss = sheet_url, sheet = "ds_area")
+sheet_write(ds_geography, ss = sheet_url, sheet = "ds_geography")
 sheet_write(ss = sheet_url, data = ds_genre, sheet = "ds_genre")
 sheet_write(ss = sheet_url, data = ds_language, sheet = "ds_language")
 sheet_write(ss = sheet_url, data = ds_pubtype, sheet = "ds_pubtype")
