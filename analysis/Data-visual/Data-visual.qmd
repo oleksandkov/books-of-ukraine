@@ -1,0 +1,174 @@
+---
+title: "Data visualization"
+author: "Oleksandr Koval"
+format:
+  html:
+    page-layout: full
+    toc: true
+    toc-location: right
+    code-fold: show
+    theme: yeti
+    highlight-style: breeze
+    colde-line-numbers: true
+    self-contained: true
+    embed-resources: true
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# Mission
+
+This document created to make easier understanding data that we are working.
+
+# Introduction
+
+In this document we will observe some tables:
+
+-   ds_year ( describes the number of titles and the number of copies for each year, since 2018)
+
+-   ds_genre ( describes the number of titles and the number of copies for each year, by genre)
+
+-   ds_georaphy ( describes the number of titles and the number of copies for each year, by place)
+
+-   ds_language (describes the number of titles and the number of copies for each year, by language)
+
+-   ds_pubtype ( describes the number of titles and the number of copies for each year, by publication type)
+
+-   ds_ukr_rus (describes the number of titles and the number of copies, the percentage of Ukrainian and russian books for each year)
+
+# Preparing
+
+Load libraries that are used in this report
+
+```{r}
+#| label: preparing
+#| code-summary: load libraries
+#| echo: true
+#| results: hide
+#| message: false
+#| code-fold: true
+
+library(dplyr)
+library(ggplot2)
+
+```
+
+
+# Data import
+
+We will be working with the data that describes the two main measures: the number of titles (title_count) and the number of copies (copy_count). We have specific tables that describe these measures under different conditions.
+
+```{r}
+#| label: data-import
+#| code-summary: Load data
+#| echo: true
+#| results: hide
+#| code-fold: true
+
+getwd()
+ds_genre <- readRDS("../../data-private/derived/manipulation/ds_genre.rds") # load ds_genre
+
+ds_year <- readRDS("../../data-private/derived/manipulation/ds_year.rds") # load ds_year
+
+ds_language  <- readRDS("../../data-private/derived/manipulation/ds_language.rds") # load ds_language
+
+ds_geography  <- readRDS("../../data-private/derived/manipulation/ds_geography.rds") # load ds_geography
+
+ds_pubtype  <- readRDS("../../data-private/derived/manipulation/ds_pubtype.rds") # load ds_pubtype
+
+ds_ukr_rus  <- readRDS("../../data-private/derived/manipulation/ds_ukr_rus.rds") # load ds_ukr_rus
+
+
+```
+
+
+# What we going to do?
+
+We want to do a short visualization for each table, to make easier understanding the data (you observe few graphs that describe the data)
+
+# Lets see
+
+
+## DS_YEAR
+
+This table has `r nrow(ds_year)` rows, and `r ncol(ds_year)` columns. Also, in the **measure** column we have only two possible values - *title_count* means the number of titles and *copy_count* means the number of copies. In the column **value** we have the numerical numbers for both measures.
+
+
+The first graph observe the number of copies for each year.
+```{r}
+#| label: g_year_copy
+#| code-summary: Making graph
+#| results: markup
+#| message: false
+#| code-fold: true
+#| warning: false
+#| fig-width: 12
+#| fig-height: 6
+
+
+years_all <- seq(min(ds_year$yr), max(ds_year$yr))
+
+g_year_copy <- ds_year %>% 
+  filter(measure == "copy_count") %>% 
+  ggplot(aes(x = yr, y = value)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = years_all) +             
+  scale_y_continuous(breaks = seq(0, 80000, by = 10000), limits = c(0, 80000)) +  # Tick every 15,000
+  labs(
+    title = "Number of Copies by Year"
+    , x = "The year"
+    , y = "Number of copies (ths.)"
+  )+
+  theme_minimal() +
+  theme(panel.grid.minor = element_blank()) 
+
+g_year_copy
+```
+
+
+The second graph observe the number of titles for each year.
+
+```{r}
+#| label: g_year_title
+#| code-summary: Making graph
+#| results: markup
+#| message: false
+#| code-fold: true
+#| warning: false
+#| fig-width: 12
+#| fig-height: 6
+
+
+g_year_title <- ds_year %>% 
+  filter(
+    measure == "title_count"
+  ) %>% 
+  ggplot(aes(x = yr, y = value)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = years_all) +
+  scale_y_continuous(breaks = seq(0, 27500, by = 5000), limits = c(7500, 27500)) +
+  theme_minimal() +
+  labs(
+    title = "Number of Titles by Year"
+    , x = "The year"
+    , y = "Number of titles"
+  ) +
+  theme(panel.grid.minor = element_blank()) 
+
+g_year_title
+
+rm(g_year_title, g_year_copy, years_all)
+
+```
+
+What we can observe:
+
+- the most productive year for new titles and the year with most copies
+
+- the production trend
+
+
+## DS_GENRE
