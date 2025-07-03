@@ -12,4 +12,4 @@ Contains reproducible reports narrating the engagement with the data of choice
 
 # Data Visualization
 
-`./analysis/data-visualization` -  in this file you can find visual resources for data we observed
+- `./analysis/data-visualization` -  in this file you can find visual resources for data we observed
