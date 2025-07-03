@@ -375,9 +375,9 @@ g_geography_krym_title <-
 
 # ----------------------------------------- DS_LANGUAGE -------------------------------------------------------------
 
-ds4 <- readRDS("data-private/derived/manipulation/ds_language.rds")
+g_lanugae <- readRDS("data-private/derived/manipulation/ds_language.rds")
 
-g_language <-  %>%
+g_language <- g_lanugae %>%
   pivot_longer(
     cols = -c(yr, measure),     
     names_to = "language",
