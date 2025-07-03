@@ -25,7 +25,7 @@ This document created to make easier understanding data that we are working.
 
 In this document we will observe some tables:
 
--   **ds_year**  (describes the number of titles and the number of copies for each year, since 2018)
+-   **ds_year** (describes the number of titles and the number of copies for each year, since 2018)
 
 -   **ds_genre** (describes the number of titles and the number of copies for each year, by genre)
 
@@ -35,9 +35,9 @@ In this document we will observe some tables:
 
 -   **ds_pubtype** (describes the number of titles and the number of copies for each year, by publication type)
 
--   **ds_ukr_rus**  (describes the number of titles and the number of copies, and the percentage of Ukrainian and Russian books for each year)
+-   **ds_ukr_rus** (describes the number of titles and the number of copies, and the percentage of Ukrainian and Russian books for each year)
 
-***P.s:*** All tables contain information for 2005–2024, except for *ds_language* 
+***P.s:*** All tables contain information for 2005–2024, except for *ds_language*
 
 # Preparing
 
@@ -178,7 +178,7 @@ What can we observe?
 
 -   The most productive year for new titles and the year with the most copies
 
--  The overall production trend
+-   The overall production trend
 
 ## DS_GENRE
 
@@ -344,10 +344,10 @@ g_geography <- ds_geography %>%
 
 ## Inspecting the number of copies
 
-
 ### Central Ukraine (Copy count)
 
 This graph describes the number of copies for each region in **Central Ukraine**
+
 ```{r}
 #| label: g_central_copy
 #| code-summary: Making graph
@@ -448,7 +448,6 @@ rm(g_geography_pivnichna_copies)
 
 ```
 
-
 ### South Ukraine (Copy count)
 
 This graph describes the number of copies for each region in **South Ukraine**
@@ -504,6 +503,7 @@ rm(g_geography_pivdena_copies)
 ### West Ukraine (Copy count)
 
 This graph describes the number of copies for each region in **West Ukraine**
+
 ```{r}
 #| label: g_west_copy
 #| code-summary: Making graph
@@ -744,11 +744,9 @@ g_geography_pivnichna_title_plotly
 rm(g_geography_pivnichna_title)
 ```
 
-
 ### South Ukraine (Titles count)
 
 This graph describes the number of titles for each region in **South Ukraine**
-
 
 ```{r}
 #| label: g_south_title
@@ -903,7 +901,6 @@ rm(g_geography_shidna_title)
 
 This graph describes the number of titles for **Crimea**
 
-
 ```{r}
 #| label: g_krym_title
 #| code-summary: Making graph
@@ -1023,7 +1020,6 @@ rm(g_language_2018)
 
 ### 2019 (Language)
 
-
 ```{r}
 #| label: g_language_2019
 #| code-summary: Making graph
@@ -1080,7 +1076,6 @@ rm(g_language_2019)
 ```
 
 ### 2020 (Language)
-
 
 ```{r}
 #| label: g_language_2020
@@ -1139,7 +1134,6 @@ rm(g_language_2020)
 
 ### 2021 (Language)
 
-
 ```{r}
 #| label: g_language_2021
 #| code-summary: Making graph
@@ -1195,7 +1189,6 @@ rm(g_language_2021)
 ```
 
 ### 2022 (Language)
-
 
 ```{r}
 #| label: g_language_2022
@@ -1254,7 +1247,6 @@ rm(g_language_2022)
 
 ### 2023 (Language)
 
-
 ```{r}
 #| label: g_language_2023
 #| code-summary: Making graph
@@ -1310,7 +1302,6 @@ rm(g_language_2023)
 ```
 
 ### 2024 (Language)
-
 
 ```{r}
 #| label: g_language_2024
@@ -1372,7 +1363,6 @@ rm(g_language_2024)
 This table has `r nrow(ds_pubtype)` rows and `r ncol(ds_pubtype)` columns. In the **measure** column, there are only two possible values: *title_count* (the number of titles) and *copy_count* (the number of copies). Starting from the third column, each column represents a different publication type.
 
 The first graph shows the number of copies for each publication type, by year.
-
 
 ```{r}
 #| label: g_pubtype_copy
@@ -1495,9 +1485,7 @@ rm(ds_pubtype_title, g_pubtype_title)
 
 ```
 
-
 ## DS_UKR_RUS
-
 
 This table has `r nrow(ds_pubtype)` rows and `r ncol(ds_pubtype)` columns. In the **measure** column, there are only two possible values: *title_count* (the number of titles) and *copy_count* (the number of copies). The third column shows the percentage of Ukrainian books among Ukrainian and Russian editions. The fourth column shows the percentage of Russian books among Ukrainian and Russian editions.
 
@@ -1553,8 +1541,7 @@ g_ukrrus_copies_plotly
 rm(g_ukrrus_copies)
 ```
 
-
-Second graph describes the number of titles of Ukrainian and russian titles for each year since 2005 to 2024. 
+Second graph describes the number of titles of Ukrainian and russian titles for each year since 2005 to 2024.
 
 ```{r}
 #| label: g_ukrrus_title
@@ -1606,6 +1593,6 @@ g_ukrrus_title_plotly
 rm(g_ukrrus_title)
 ```
 
-# Overral 
+# Overral
 
 This document was created to help you gain a deeper understanding of the data. I hope you found it useful! 😉
