@@ -13,3 +13,5 @@ Contains reproducible reports narrating the engagement with the data of choice
 # Data Visualization
 
 - `./analysis/data-visualization` -  in this file you can find visual resources for data we observed
+
+- [Data-Visualization](https://raw.githack.com/RB-FIDES/books-of-ukraine/main/analysis/Data-visualization/Data-visual.html) - short review about each table 
