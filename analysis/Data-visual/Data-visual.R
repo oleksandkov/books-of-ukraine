@@ -377,7 +377,7 @@ g_geography_krym_title <-
 
 ds4 <- readRDS("data-private/derived/manipulation/ds_language.rds")
 
-g_language <- ds4 %>%
+g_language <-  %>%
   pivot_longer(
     cols = -c(yr, measure),     
     names_to = "language",
@@ -536,7 +536,7 @@ g_language_2024 <-
 ds5 <- readRDS("data-private/derived/manipulation/ds_pubtype.rds") 
 
 
-ds5 <- ds5 %>%
+ds_pubtype_l <- ds_pubtype %>%
   pivot_longer(
     cols = -c(yr, measure),    # залишаємо 'yr' і 'measure', інше — типи видань
     names_to = "pubtype",      # назва нової колонки з типом
@@ -545,7 +545,7 @@ ds5 <- ds5 %>%
 
 
 ds_pubtype_copy <- 
-  ds5 %>%
+  ds_pubtype_l %>%
   filter(measure == "copy_count") %>%
   group_by(yr)
 
@@ -595,7 +595,7 @@ g_pubtype_title <- ds_pubtype_title %>%
 ds6 <- readRDS("data-private/derived/manipulation/ds_ukr_rus.rds")
 
 g_ukrrus_copies <- 
-  ds6 %>%
+  ds_ukr_rus %>%
   filter(measure == "copy_count") %>%
   select(yr, ukr, rus) %>%
   pivot_longer(
