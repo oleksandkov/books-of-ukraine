@@ -165,7 +165,7 @@ for (sheet_name in names(all_data)) {
     file = file_path
   )
   cat("Збережено:", sheet_name, "→", file_path, "\n")
-}
+} 
 
 # Optional: Save as CSV files for external access
 csv_folder <- paste0(data_private_derived, "csv/")
