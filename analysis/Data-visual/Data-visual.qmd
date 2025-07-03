@@ -25,23 +25,23 @@ This document created to make easier understanding data that we are working.
 
 In this document we will observe some tables:
 
--   **ds_year** ( describes the number of titles and the number of copies for each year, since 2018)
+-   **ds_year**  (describes the number of titles and the number of copies for each year, since 2018)
 
--   **ds_genre** ( describes the number of titles and the number of copies for each year, by genre)
+-   **ds_genre** (describes the number of titles and the number of copies for each year, by genre)
 
--   **ds_georaphy** ( describes the number of titles and the number of copies for each year, by place)
+-   **ds_georaphy** (describes the number of titles and the number of copies for each year, by region)
 
 -   **ds_language** (describes the number of titles and the number of copies for each year, by language)
 
--   **ds_pubtype** ( describes the number of titles and the number of copies for each year, by publication type)
+-   **ds_pubtype** (describes the number of titles and the number of copies for each year, by publication type)
 
--   **ds_ukr_rus** (describes the number of titles and the number of copies, the percentage of Ukrainian and russian books for each year)
+-   **ds_ukr_rus**  (describes the number of titles and the number of copies, and the percentage of Ukrainian and Russian books for each year)
 
-***P.s:*** all table have information for 2005 - 2024, expect *ds_language* 
+***P.s:*** All tables contain information for 2005–2024, except for *ds_language* 
 
 # Preparing
 
-Load libraries that are used in this report
+Load the libraries used in this report.
 
 ```{r}
 #| label: preparing
@@ -60,7 +60,7 @@ library(plotly)
 
 # Data import
 
-We will be working with the data that describes the two main measures: the number of titles (title_count) and the number of copies (copy_count). We have specific tables that describe these measures under different conditions.
+We will be working with data that describes two main measures: the number of titles (**title_count**) and the number of copies (**copy_count**). Several specific tables provide these measures under different conditions.
 
 ```{r}
 #| label: data-import
@@ -87,15 +87,15 @@ ds_ukr_rus  <- readRDS("../../data-private/derived/manipulation/ds_ukr_rus.rds")
 
 # What we going to do?
 
-We want to do a short visualization for each table, to make easier understanding the data (you observe few graphs that describe the data)
+We will create a short visualization for each table to make the data easier to understand. You will see several graphs that describe the main features of the data.
 
 # Lets start !
 
 ## DS_YEAR
 
-This table has `r nrow(ds_year)` rows, and `r ncol(ds_year)` columns. Also, in the **measure** column we have only two possible values - *title_count* means the number of titles and *copy_count* means the number of copies. In the column **value** we have the numerical numbers for both measures.
+This table has `r nrow(ds_year)` rows and `r ncol(ds_year)` columns. In the **measure** column, there are only two possible values: **title_count** (the number of titles) and **copy_count** (the number of copies). The value column contains the numeric data for both measures.
 
-The first graph observe the number of copies for each year.
+The first graph shows the number of copies for each year.
 
 ```{r}
 #| label: g_year_copy
@@ -174,17 +174,17 @@ rm(g_year_title, g_year_copy, years_all)
 
 ```
 
-What we can observe:
+What can we observe?
 
--   the most productive year for new titles and the year with most copies
+-   The most productive year for new titles and the year with the most copies
 
--   the production trend
+-  The overall production trend
 
 ## DS_GENRE
 
-This table has `r nrow(ds_genre)` rows, and `r ncol(ds_genre)` columns. Also, in the **measure** column we have only two possible values - *title_count* means the number of titles and *copy_count* means the number of copies. From the third column, each column is a separate genre.
+This table has `r nrow(ds_genre)` rows and `r ncol(ds_genre)` columns. In the **measure** column, there are only two possible values: **title_count** (the number of titles) and **copy_count** (the number of copies). Starting from the third column, each column represents a separate genre.
 
-In a first graph, we see the number of copies of each genre, by year.
+In the first graph, we see the number of copies for each genre, by year.
 
 ```{r}
 #| label: g_genre_copy
@@ -307,7 +307,7 @@ rm(g_genre_copy, ds_genre_copy, ds_genre_title, g_genre_title)
 
 ## DS_GEOGRAPHY
 
-This table has `r nrow(ds_geography)` rows, and `r ncol(ds_geography)` columns. Also, in the **measure** column we have only two possible values - *title_count* means the number of titles and *copy_count* means the number of copies. From the third column, each column is a separate geographical place.
+This table has `r nrow(ds_geography)` rows and `r ncol(ds_geography)` columns. In the **measure** column, there are only two possible values: **title_count** (the number of titles) and **copy_count** (the number of copies). Starting from the third column, each column represents a separate geographical region.
 
 ```{r}
 #| label: geography-preparing
@@ -944,9 +944,9 @@ rm(g_geography_krym_title)
 
 ## DS_LANGUAGE
 
-This table has `r nrow(ds_language)` rows, and `r ncol(ds_language)` columns. Also, in the **measure** column we have only two possible values - *title_count* means the number of titles and *copy_count* means the number of copies. From the third column, each column is new language. We have information only for **2018 - 2024** years.
+This table has `r nrow(ds_language)` rows and `r ncol(ds_language)` columns. In the **measure** column, there are only two possible values: **title_count** (the number of titles) and **copy_count** (the number of copies). Starting from the third column, each column represents a new language. Data is available only for the years **2018–2024**.
 
-Do to inspection of this table,  we will observe each year separately. Each graph display only those language, which have at least 10 different titles and 10.000 copies.
+To analyze this table, we will examine each year separately. Each graph displays only those languages that have at least 10 different titles and 10,000 copies.
 
 ```{r}
 #| label: language-preparing
@@ -1369,9 +1369,9 @@ rm(g_language_2024)
 
 ## DS_PUBTYPE
 
-This table has `r nrow(ds_pubtype)` rows, and `r ncol(ds_pubtype)` columns. Also, in the **measure** column we have only two possible values - *title_count* means the number of titles and *copy_count* means the number of copies. From the third column, each column is new publication type.
+This table has `r nrow(ds_pubtype)` rows and `r ncol(ds_pubtype)` columns. In the **measure** column, there are only two possible values: *title_count* (the number of titles) and *copy_count* (the number of copies). Starting from the third column, each column represents a different publication type.
 
-First graph describes the number of copies of each publication type, by year.
+The first graph shows the number of copies for each publication type, by year.
 
 
 ```{r}
@@ -1499,10 +1499,9 @@ rm(ds_pubtype_title, g_pubtype_title)
 ## DS_UKR_RUS
 
 
-This table has `r nrow(ds_pubtype)` rows, and `r ncol(ds_pubtype)` columns. Also, in the **measure** column we have only two possible values - *title_count* means the number of titles and *copy_count* means the number of copies. Third column describes the percentage Ukrainian versions to ukr and rus versions. Froths, describes the percentage of russian versions to ukr and rus versions.
+This table has `r nrow(ds_pubtype)` rows and `r ncol(ds_pubtype)` columns. In the **measure** column, there are only two possible values: *title_count* (the number of titles) and *copy_count* (the number of copies). The third column shows the percentage of Ukrainian books among Ukrainian and Russian editions. The fourth column shows the percentage of Russian books among Ukrainian and Russian editions.
 
-First graph describer the number of copies of Ukrainian and russian copies for each year since 2005 to 2024. 
-
+The first graph shows the number of copies of Ukrainian and Russian books for each year from 2005 to 2024.
 
 ```{r}
 #| label: g_ukrrus_copy
@@ -1555,7 +1554,7 @@ rm(g_ukrrus_copies)
 ```
 
 
-Second graph describer the number of titles of Ukrainian and russian titles for each year since 2005 to 2024. 
+Second graph describes the number of titles of Ukrainian and russian titles for each year since 2005 to 2024. 
 
 ```{r}
 #| label: g_ukrrus_title
@@ -1609,4 +1608,4 @@ rm(g_ukrrus_title)
 
 # Overral 
 
-This document created to help understand the date more deeply. I hope it was useful for you. 😉 
+This document was created to help you gain a deeper understanding of the data. I hope you found it useful! 😉
