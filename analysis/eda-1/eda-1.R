@@ -89,7 +89,7 @@ ds_publisher_type <- ds_pub_count %>%
   slice(81:108) %>%
   pivot_longer(cols = -c(1), names_to = "year", values_to = "count") %>%
   mutate(year = str_remove(year, "x") %>% as.integer())
-ds_publisher %>% glimpse()
+ds_publisher_type %>% glimpse()
 
 # we now have four tabless, each offerring a different breakdown:
 # total, genre, oblast, and publisher type
