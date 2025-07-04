@@ -281,8 +281,7 @@
 
 Всі наявні таблиці будуть доступні у форматах **CSV** (Comma-Separated Values), **RDS** (R Data Serialization) та будуть поміщені до **SQLite** бази даних для зручного доступу та аналізу.
 
-Щоб отримати доступ до цих форматів даних, необхідно "запустити" код з файлу `/manipulation/0-ellis-sasha.R` та виконати його у RStudio. Після цього дані будуть доступні у директорії  
-`data-private/derived/manipulation/`.
+Щоб отримати доступ до цих форматів даних, необхідно "запустити" код з файлу `/manipulation/0-ellis-sasha.R` та виконати його у RStudio. Після цього дані будуть доступні у директорії `data-private/derived/manipulation/`.
 
 Також дані можна переглянути у форматі **QMD** (Quarto Markdown) у файлі `Data-visualization.qmd` або у форматі **HTML** у файлі [Data-visualization.html](https://raw.githack.com/RB-FIDES/books-of-ukraine/main/analysis/Data-visualization/Data-visual.html).
 
