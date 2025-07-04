@@ -343,7 +343,7 @@
 - Використовуй корректні шляхи для імпорту даних у RStudio, наприклад: 
    - шлях до RDS: `data-private/derived/manipulation/ds_name of file.rds`
    - шлях до CSV: `data-private/derived/manipulation/csv/ds_name of file.csv`
-   - шлях до SQLite Database: `data-private/derived/manipulation/SQLite/books-of-ukraine.sqlite
+   - шлях до SQLite Database: `data-private/derived/manipulation/SQLite/books-of-ukraine.sqlite`
 
 ---
 
