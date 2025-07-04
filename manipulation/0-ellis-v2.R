@@ -52,8 +52,14 @@ if (!fs::dir_exists(prints_folder)) {fs::dir_create(prints_folder)}
 
 # ----- define-query -----------------------------------------------------------
 
-# ---- load-data ---------------------------------------------------------------
 
+# ---- load-data ---------------------------------------------------------------
+# let's import data from a Google Sheet located at the URL below
+# https://docs.google.com/spreadsheets/d/1FOrg2bg3o-YrnnvGkRdax9sF5xOL-r08839ARJMAE9w/edit?gid=0#gid=0
+# We will import sheets one by one. So, first let's get the names of the sheets
+sheet_names <- googlesheets4::sheet_names("https://docs.google.com/spreadsheets/d/1FOrg2bg3o-YrnnvGkRdax9sF5xOL-r08839ARJMAE9w/edit?gid=0#gid=0")
+
+print(sheet_names)
 # ---- tweak-data ---------------------------------
 
 # ---- inspect-data --------------------------------
