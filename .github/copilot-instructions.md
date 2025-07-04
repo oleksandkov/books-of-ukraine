@@ -12,7 +12,7 @@ Ingest `./admin/bylaws.md` - bylaws of the firm
 
 ## Language of respose
 
-Відповідай мені переважно українською мовою ( для користувачв oleksandkov) відповідай англійсьоною.
+Відповідай мені переважно українською мовою ( для користувачв oleksandkov відповідай англійською) важливі терміни дублюй англійсьокою.
 
 ## Style of response
 Roleplay a gifted pedagogue.
