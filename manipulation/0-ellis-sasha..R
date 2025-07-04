@@ -24,6 +24,8 @@ library(ggalluvial)
 library(janitor)
 library(openxlsx)
 library(googlesheets4)
+library(DBI)      # For database connection and operations
+library(RSQLite)
 # -- 2.Import only certain functions of a package into the search path.
 # import::from("magrittr", "%>%")
 # -- 3. Verify these packages are available on the machine, but their functions need to be qualified
@@ -738,11 +740,41 @@ saveRDS(ds_ukr_rus, "data-private/derived/manipulation/ds_ukr_rus.rds")
 
 
 # ---------------------------------------------------------------------- Converting to Spreadsheets ----------
+
 sheet_url <- "https://docs.google.com/spreadsheets/d/1OOKeZnMFEAzHyr_M51zaOe76uv1yuqNmveHXSKpeqpo/edit?gid=0#gid=0"
 sheet_write(ds_geography, ss = sheet_url, sheet = "ds_geography")
 sheet_write(ss = sheet_url, data = ds_genre, sheet = "ds_genre")
-sheet_write(ss = sheet_url, data = ds_language, sheet = "ds_language")
+sheet_write(ss = sheet_url, data = ds_language, sheet = "ds_language") # How do import like this but to csv version? 
 sheet_write(ss = sheet_url, data = ds_pubtype, sheet = "ds_pubtype")
 sheet_write(ss = sheet_url, data = ds_year, sheet = "ds_year")
 sheet_write(ss = sheet_url, data = ds_ukr_rus, sheet = "ds_ukr_rus")
+# ---------------------------------------------------------------------- Converting to CSV ----------
+# Save ds_geography to CSV
+write.csv(ds_geography, "data-private/derived/manipulation/csv/ds_geography.csv", row.names = FALSE)
 
+# Save ds_genre to CSV
+write.csv(ds_genre, "data-private/derived/manipulation/csv/ds_genre.csv", row.names = FALSE)
+
+# Save ds_language to CSV
+write.csv(ds_language, "data-private/derived/manipulation/csv/ds_language.csv", row.names = FALSE)
+
+# Save ds_pubtype to CSV
+write.csv(ds_pubtype, "data-private/derived/manipulation/csv/ds_pubtype.csv", row.names = FALSE)
+
+# Save ds_year to CSV
+write.csv(ds_year, "data-private/derived/manipulation/csv/ds_year.csv", row.names = FALSE)
+
+# Save ds_ukr_rus to CSV
+write.csv(ds_ukr_rus, "data-private/derived/manipulation/csv/ds_ukr_rus.csv", row.names = FALSE)
+
+# ---------------------------------------------------------------------- Converting to SQLite ----------
+
+books_of_ukraine <- dbConnect(RSQLite::SQLite(), "data-private/derived/manipulation/SQLite/books-of-ukraine.sqlite")
+dbWriteTable(books_of_ukraine, "ds_geography", ds_geography, overwrite = TRUE)
+dbWriteTable(books_of_ukraine, "ds_genre", ds_genre, overwrite = TRUE)
+dbWriteTable(books_of_ukraine, "ds_language", ds_language, overwrite = TRUE)
+dbWriteTable(books_of_ukraine, "ds_pubtype", ds_pubtype, overwrite = TRUE)
+dbWriteTable(books_of_ukraine, "ds_year", ds_year, overwrite = TRUE)
+dbWriteTable(books_of_ukraine, "ds_ukr_rus", ds_ukr_rus, overwrite = TRUE)
+dbDisconnect(books_of_ukraine)
+# ---------------------------------------------------------------------- End of Script -------------------
