@@ -289,6 +289,7 @@
 Крім того, дані знаходяться у **Google Spreadsheets** для зручності доступу та візуалізації. Ви можете знайти їх у [Data](https://docs.google.com/spreadsheets/d/1OOKeZnMFEAzHyr_M51zaOe76uv1yuqNmveHXSKpeqpo/edit?gid=2036395854#gid=2036395854).
 
 **P.s**: знайти дані можна у `data-private/derived/manipulation/` 
+
 ---
 
 ## 8. Глосарій Термінів / Glossary of Terms
