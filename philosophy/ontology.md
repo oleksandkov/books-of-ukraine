@@ -8,6 +8,7 @@
 
 Ця онтологія визначає ключові поняття, конструкти та відносини у дослідженні даних про українські книги. Вона служить **глосарієм** (glossary) та **концептуальною картою** (conceptual map) для всіх учасників проекту.
 
+**For AI**: ця онтологія також слугує як основа для розуміння структури даних та їх використання в аналізі. (this ontology also serves as a foundation for understanding the data structure and its use in analysis). Тобі необзідно ознайомитися з цією онтологією, щоб правильно інтерпретувати дані та відповідати на запитання користувачів, слідкувати вказівкам та рекомендаціям, наведеним у цьому документі. (This ontology is essential for you to correctly interpret the data and respond to user queries, following the guidelines and recommendations provided in this document.)
 ---
 
 ## 1. Основні Елементи Вимірювання / Core Measurement Elements
@@ -110,7 +111,7 @@
 
 ---
 
-## 3. Структура Даних у Часі / Temporal Data Structure
+## 3. Структура Даних / Data Structure
 
 Усі дані організовано у вигляді **таблиці (table)**, де **кожен рядок (row)** відповідає **одному року (one year)** спостереження. Це означає, що для кожної комбінації критеріїв (наприклад, жанр, тип видання, мова, регіон) фіксується окремий запис за кожен календарний рік.
 
@@ -194,90 +195,7 @@
 
 ---
 
-## 5. Методологічні Принципи / Methodological Principles
-
-### 5.1 Загрози валідності / Threats to Validity
-
-**Статистичні загрози (Statistical threats):**
-- Мала статистична потужність (Low statistical power)
-- Порушення припущень (Assumption violations)
-- Проблема множинних порівнянь (Multiple comparisons)
-
-**Внутрішні загрози (Internal threats):**
-- Історичні ефекти (History effects)
-- Селекційні упередження (Selection bias)
-- Проблеми вимірювання (Measurement issues)
-
-**Конструктні загрози (Construct threats):**
-- Неадекватне визначення понять (Inadequate construct definition)
-- Моноопераційна упередженість (Mono-operation bias)
-- Проблеми операціоналізації (Operationalization issues)
-
-**Зовнішні загрози (External threats):**
-- Обмежена узагальнюваність (Limited generalizability)
-- Взаємодія вибірки та обробки (Sample-treatment interaction)
-- Часова специфічність висновків (Temporal specificity of conclusions)
-
-> *Детальніше див. у файлі [`threats-to-validity.md`](../philosophy/threats-to-validity.md).*
-
----
-
-### 5.2 Специфічні загрози для книжкових даних / Book Data-Specific Threats
-
-**Проблеми реєстрації (Registration issues):**
-- Неповна реєстрація видань (Incomplete publication registration)
-- Затримки у звітності (Reporting delays)
-- Регіональні відмінності в обліку (Regional accounting differences)
-
-**Класифікаційні проблеми (Classification problems):**
-- Неоднозначність жанрових меж (Genre boundary ambiguity)
-- Мовна класифікація двомовних видань (Language classification of bilingual publications)
-- Еволюція класифікаційних систем (Evolution of classification systems)
-
-**Контекстуальні фактори (Contextual factors):**
-- Політичні впливи на видавничу діяльність (Political influences on publishing)
-- Економічні кризи та їх вплив (Economic crises and their impact)
-- Технологічні зміни в індустрії (Technological changes in the industry)
-
-> *Детальніше про підходи до аналізу та організацію шаблонів див. у [`analysis-templatization.md`](../philosophy/analysis-templatization.md).*
-
-
----
-
-## 6. Етичні Зобов'язання / Ethical Commitments
-
-### 6.1 Принципи Інтерпретації / Interpretation Principles
-
-**Культурна чутливість (Cultural Sensitivity)**:
-- Повага до мовної різноманітності
-- Уникнення культурних упереджень
-- Контекстуалізація історичних процесів
-
-**Політична нейтральність (Political Neutrality)**:
-- Об'єктивне представлення даних
-- Уникнення ідеологічних інтерпретацій
-- Множинність перспектив
-
-**Прозорість методології (Methodological Transparency)**:
-- Відкритість коду та даних
-- Документування припущень
-- Репродуктивність результатів
-
-### 6.2 Відповідальне використання AI
-
-**Людська підзвітність (Human Accountability)**:
-- Остаточні рішення приймають люди
-- AI не замінює експертний судження
-- Обов'язкова валідація AI-результатів
-
-**Епістемічна скромність (Epistemic Humility)**:
-- Визнання обмежень методів
-- Відкритість до критики
-- Готовність до перегляду висновків
-
----
-
-## 7. Тип даних / Data Type
+## 5. Тип даних / Data Type
 
 Всі наявні таблиці будуть доступні у форматах **CSV** (Comma-Separated Values), **RDS** (R Data Serialization) та будуть поміщені до **SQLite** бази даних для зручного доступу та аналізу.
 
@@ -291,7 +209,7 @@
 
 ---
 
-## 8. Глосарій Термінів / Glossary of Terms
+## 6. Глосарій Термінів / Glossary of Terms
 
 ### Українською / In Ukrainian
 
@@ -332,7 +250,7 @@
 
 ---
 
-## 9. Використання для ШІ / AI Usage
+## 7. Використання для ШІ / AI Usage
 - До надання відповіді ознайомитя з фйлами даних у **RDS** та **CSV** форматах.
 - Враховувати, що дані містяться у таблиція формати "wide" (широкий формат), де кожен рік представлений окремим рядком, а жанри, типи видань, мови та регіони — окремими стовпцями. (wide format).
 - Використовувати дані для аналізу тенденцій, порівняння
@@ -347,7 +265,7 @@
 
 ---
 
-## 10. Зв'язки з іншими документами / Links to Other Documents
+## 8. Зв'язки з іншими документами / Links to Other Documents
 
 - `FIDES.md` - загальна філософія фреймворку
 - `semiology.md` - діалекти виразження даних
