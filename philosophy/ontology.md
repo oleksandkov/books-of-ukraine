@@ -11,7 +11,6 @@
 
 **For AI**: ця онтологія також слугує як основа для розуміння структури даних та їх використання в аналізі. (this ontology also serves as a foundation for understanding the data structure and its use in analysis). Тобі необзідно ознайомитися з цією онтологією, щоб правильно інтерпретувати дані та відповідати на запитання користувачів, слідкувати вказівкам та рекомендаціям, наведеним у цьому документі. (This ontology is essential for you to correctly interpret the data and respond to user queries, following the guidelines and recommendations provided in this document.)
 
-
 ---
 
 ## 1. Основні Елементи Вимірювання / Core Measurement Elements
