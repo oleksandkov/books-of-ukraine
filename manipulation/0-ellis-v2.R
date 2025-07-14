@@ -20,7 +20,7 @@ library(tidyr)     # data wrangling
 library(scales)    # format
 library(broom)     # for model
 library(emmeans)   # for interpreting model results
-library(ggalluvial)
+# library(ggalluvial)
 # -- 2.Import only certain functions of a package into the search path.
 # import::from("magrittr", "%>%")
 # -- 3. Verify these packages are available on the machine, but their functions need to be qualified
@@ -50,6 +50,57 @@ if (!fs::dir_exists(prints_folder)) {fs::dir_create(prints_folder)}
 
 # ---- declare-functions -------------------------------------------------------
 
+import_selected_sheets <- function(sheet_url, sheets_to_import, clean_names = TRUE) {
+  
+  # Get sheet information
+  sheet_info <- googlesheets4::gs4_get(sheet_url)
+  all_sheet_names <- sheet_info$sheets$name
+  
+  cat("Доступні вкладки (sheets):\n")
+  cat(paste(all_sheet_names, collapse = ", "), "\n")
+  
+  # Check which sheets to import
+  valid_sheets <- sheets_to_import[sheets_to_import %in% all_sheet_names]
+  
+  if (length(valid_sheets) == 0) {
+    stop("Жодної з вказаних вкладок не знайдено у Google Sheets.")
+  }
+  
+  cat("\nБуде імпортовано", length(valid_sheets), "вкладок:\n")
+  cat(paste(valid_sheets, collapse = ", "), "\n")
+  
+  # Import selected sheets and combine into a data frame
+  all_tables <- list()
+  
+  for (sheet_name in valid_sheets) {
+    cat("Завантажуємо вкладку:", sheet_name, "\n")
+    
+    # Import the sheet
+    sheet_data <- googlesheets4::read_sheet(
+      ss = sheet_url,
+      sheet = sheet_name,
+      .name_repair = "minimal"
+    )
+    
+    # Convert all columns to character
+    sheet_data <- sheet_data %>% dplyr::mutate(across(everything(), as.character))
+    
+    # Clean column names if requested
+    if (clean_names) {
+      sheet_data <- janitor::clean_names(sheet_data)
+    }
+    
+    # Store in list
+    all_tables[[sheet_name]] <- sheet_data
+    
+    cat("  - Розмір:", nrow(sheet_data), "рядків x", ncol(sheet_data), "колонок\n")
+  }
+  
+  # Combine all sheets into a single data frame (no sheet_name column)
+  combined_table <- dplyr::bind_rows(all_tables, .id = NULL)
+  
+  return(combined_table)
+}
 # ----- define-query -----------------------------------------------------------
 
 
@@ -60,9 +111,54 @@ if (!fs::dir_exists(prints_folder)) {fs::dir_create(prints_folder)}
 sheet_names <- googlesheets4::sheet_names("https://docs.google.com/spreadsheets/d/1FOrg2bg3o-YrnnvGkRdax9sF5xOL-r08839ARJMAE9w/edit?gid=0#gid=0")
 
 print(sheet_names)
+
+# make sure you import each column is imported as a character data type:
+ds0 <- import_selected_sheets(
+  sheet_url = "https://docs.google.com/spreadsheets/d/1FOrg2bg3o-YrnnvGkRdax9sF5xOL-r08839ARJMAE9w/edit?gid=613842371#gid=613842371",
+  sheets_to_import = "К-ть видань"
+)
+ds0 %>% glimpse()
 # ---- tweak-data ---------------------------------
+# some  numerical values contain spaces (e.g. "15 720", but we need it to be numeric 15720)
+# mutate each column startin with "x" to remove spaces and convert to numeric
+# replace "x" prefix with "year_" prefix
+# ---- tweak-data ---------------------------------
+ds1 <- ds0 %>%
+    dplyr::mutate(across(starts_with("x"), ~ as.numeric(gsub(" ", "", .)))) %>%
+    dplyr::rename_with(~ paste0("year_", sub("^x", "", .)), starts_with("x")) # add "year_" prefix
+ds1 %>% glimpse()
+
+# change values of measure_name to english equivalents:
+# "Всього наіменувань" = title_count 
+# "тираж (тис.)" = copies_count_k
+ds2 <- 
+  ds1 %>% 
+  dplyr::mutate(
+    measure_name = dplyr::case_when(
+      measure_name == "Всього наіменувань" ~ "title_count",
+      measure_name == "тираж (тис.)" ~ "copies_count_k",
+      TRUE ~ measure_name
+    )
+  ) 
+ds2 %>% glimpse()
+
+# create a long form of the data and clean up values of the 'year' column (remove previx "year_") and store as integer
+ds3 <-
+   ds2 %>%
+  tidyr::pivot_longer(
+    cols = starts_with("year_"),
+    names_to = "year",
+    values_to = "value"
+  ) %>% 
+  dplyr::mutate(
+    year = as.integer(gsub("year_", "", year)), # remove "year_" prefix and convert to integer
+    measure_name = factor(measure_name, levels = c("title_count", "copies_count_k")) # set factor levels
+  ) 
+ds3
 
 # ---- inspect-data --------------------------------
 
 
 # ---- write-to-disk -------------------------
+ds2 %>% readr::write_csv("./data-public/derived/manipulation/ds2-ellis-v2-ds2.csv")
+ds3 %>% readr::write_csv("./data-public/derived/manipulation/ds3-ellis-v2-ds3.csv")
