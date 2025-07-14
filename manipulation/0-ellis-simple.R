@@ -47,8 +47,8 @@ if (!fs::dir_exists(prints_folder)) {fs::dir_create(prints_folder)}
 
 # ---- load-data ---------------------------------------------------------------
 # load data from data-public
-ds_wide <- readr::read_csv("./data-public/derived/manipulation/ds2-ellis-v2-ds2.csv")
-ds_long <- readr::read_csv("./data-public/derived/manipulation/ds3-ellis-v2-ds3.csv")
+ds_wide <- readr::read_csv("./data-public/derived/manipulation/0-ellis-v2-ds2.csv")
+ds_long <- readr::read_csv("./data-public/derived/manipulation/0-ellis-v2-ds3.csv")
 # ---- tweak-data-0 -------------------------------------
 
 # ---- inspect-data-0 -------------------------------------
