@@ -59,12 +59,14 @@ ggplot(
   data = penguins,
   mapping = aes(x = flipper_length_mm, y = body_mass_g)
 )
+#> Повідомляє, що вилучено 2 рядки, що містять відсутні значення (geom_point()).
+
+#> Додає точки до графіка, які представляють кожного пінгвіна
 ggplot(
   data = penguins,
   mapping = aes(x = flipper_length_mm, y = body_mass_g)
 ) +
   geom_point()
-#> Повідомляє, що вилучено 2 рядки, що містять відсутні значення (geom_point()).
 
 #> Далі нам потрібно визначити геому (geom): геометричний обʼєкт, 
 #> який графік використовує для представлення даних. 
@@ -113,11 +115,17 @@ ggplot(
     color = "Species", shape = "Species"
   ) +
   scale_color_colorblind()
+
 # Завлання 3 Створіть діаграму розсіювання bill_depth_mm проти bill_length_mm.
 ggplot(
   data = penguins,
   mapping = aes(x = bill_depth_mm, y = bill_length_mm, color = species)
 ) +
   geom_point()
+# Розсіювання не щільне, багато викидів, вірогідно для Adelie ці показники слабо корегуються
+
+# Завлання 4 Що станеться, якщо створити діаграму розсіювання видів проти bill_depth_mm? 
+# Який вибір geom може бути кращим? 
+# Не розумію 
 
 # ---- save-to-disk ------------------------------------------------------------
