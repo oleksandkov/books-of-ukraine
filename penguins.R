@@ -355,91 +355,101 @@ ggplot() +
     data = penguins,
     mapping = aes(x = flipper_length_mm, y = body_mass_g)
   )
-# ---- english-lesson-readiness-assessment ----------------------------------
 
-# 🌟 EXCEPTIONAL PROGRESS EVALUATION
-progress_assessment <- tribble(
-  ~skill_domain, ~achievement_level, ~english_integration, ~transferable_skills,
-  "R Programming", "Advanced beginner", "Technical vocabulary mastery", "Logical thinking patterns",
-  "Data Visualization", "Intermediate", "Grammar of Graphics terminology", "Visual communication skills",
-  "Problem Analysis", "Advanced", "Structured questioning in English", "Critical thinking frameworks",
-  "Documentation", "Intermediate+", "Bilingual commenting proficiency", "Academic writing preparation"
-)
+### 1.3 ggplot2 "Дзвінки"
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point()
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) + 
+  geom_point()
+penguins |> 
+  ggplot(aes(x = flipper_length_mm, y = body_mass_g)) + 
+  geom_point()
+# Розподіл категорійної змінної - використовуйте гістограму
+ggplot(penguins, aes(x = species)) +
+  geom_bar()
+# Перетворення змінної на фактор для перевпорядкування стовпців на основі їхніх частот
+ggplot(penguins, aes(x = fct_infreq(species))) +
+  geom_bar()
+# A numerical variable, histogram
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 200)
+# ширина стовпчика
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 20)
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 2000)
+# графік щільності
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_density()
+#> Warning: Removed 2 rows containing non-finite outside the scale range
+#> (`stat_density()`).
+### Tasks
+# Task 1. Побудуйте стовпчикову діаграму видів пінгвінів, 
+# де ви призначите види естетиці y.
+ggplot(penguins, aes(y = species)) +
+  geom_bar() +
+  labs(title = "Penguin Species Count", y = "Species")
+# Task 2.1.	Чим відрізняються наступні два графіки? 
+ggplot(penguins, aes(x = species)) +
+  geom_bar(color = "red")
 
-# 💡 FIDES Framework Integration з English Learning:
-fides_english_synergy <- list(
-  feasibility = "Technical English vocabulary already acquired",
-  impact = "R4DS terminology enhances academic English proficiency",
-  development = "Analytical skills transfer to language learning",
-  engagement = "Data projects create authentic communication contexts",
-  sustainability = "Bilingual coding builds long-term language confidence"
-)
-# ---- english-lesson-readiness-assessment ----------------------------------
+ggplot(penguins, aes(x = species)) +
+  geom_bar(fill = "red")
+# ✅ (fill - це естетика, яка визначає колір заливки стовпців)
+# Task 2.2. Яка естетика, колір чи заливка, 
+#є більш корисною для зміни кольору стовпців?
+# ✅ заливка (fill) є більш корисною для зміни кольору стовпців
+# Task 3 Що робить аргумент bins у geom_histogram()?
+# ✅ визначає кількість інтервалів, на які буде розділено діапазон значень 
+# Task 4. Створіть гістограму змінної carat у наборі даних diamonds
+ggplot(diamonds, aes(x = carat)) +
+  geom_bar(bins = 20, fill = "red")
+# ❓ Чому Ignoring unknown parameters: `binwidth`and `bins`?
+ds1 <- diamonds
+# ---- inspect-data-0 ----------------------------------------------------------
+ds1
+# A tibble: 53,940 × 10
 
-# 🌟 EXCEPTIONAL PROGRESS EVALUATION
-progress_assessment <- tribble(
-  ~skill_domain, ~achievement_level, ~english_integration, ~transferable_skills,
-  "R Programming", "Advanced beginner", "Technical vocabulary mastery", "Logical thinking patterns",
-  "Data Visualization", "Intermediate", "Grammar of Graphics terminology", "Visual communication skills",
-  "Problem Analysis", "Advanced", "Structured questioning in English", "Critical thinking frameworks",
-  "Documentation", "Intermediate+", "Bilingual commenting proficiency", "Academic writing preparation"
-)
+# Експериментуйте з різними ширинами бінів. ⁉️Як⁉️
+# Яка ширина бінів виявляє найцікавіші закономірності?
+### Візуалізація звʼязків
+ggplot(penguins, aes(x = species, y = body_mass_g)) +
+  geom_boxplot()
 
-# 💡 FIDES Framework Integration з English Learning:
-fides_english_synergy <- list(
-  feasibility = "Technical English vocabulary already acquired",
-  impact = "R4DS terminology enhances academic English proficiency",
-  development = "Analytical skills transfer to language learning",
-  engagement = "Data projects create authentic communication contexts",
-  sustainability = "Bilingual coding builds long-term language confidence"
-)
-# ---- english-lesson-colors --------------------------------------------
+ggplot(penguins, aes(x = body_mass_g, color = species)) +
+  geom_density(linewidth = 0.75) # Linewidth (ширина лінії)
 
-# 🟡 1. ВИВЧИТИ ОСНОВНІ КОЛЬОРИ:
-basic_colors <- c(
-  "red" = "червоний", # як помідор
-  "blue" = "синій", # як небо
-  "green" = "зелений", # як трава
-  "yellow" = "жовтий", # як сонце
-  "orange" = "помаранчевий", # як апельсин
-  "purple" = "фіолетовий", # як лаванда
-  "pink" = "рожевий", # як сакура
-  "black" = "чорний", # як ніч
-  "white" = "білий", # як сніг
-  "gray" = "сірий" # як хмари
-)
+ggplot(penguins, aes(x = body_mass_g, color = species)) +
+  geom_density(linewidth = 1) # Збільшила ширину ліній
 
-# 🎯 2. ПРАКТИКА З PENGUINS ГРАФІКАМИ
-# Змінюємо кольори у візуалізаціях
+ggplot(penguins, aes(x = body_mass_g, color = species, fill = species)) +
+  geom_density(alpha = 0.5)
 
-# 🔵 3. ВИВЧИТИ ВІДТІНКИ (SHADES)
-color_shades <- c(
-  "light blue" = "світло-синій",
-  "dark blue" = "темно-синій",
-  "bright red" = "яскраво-червоний"
-)
+# ⚠️⁉️ Note the terminology we have used here:
+#   •	We map variables to aesthetics if we want the visual attribute represented by that aesthetic to vary based on the values of that variable.
+#   •	Otherwise, we set the value of an aesthetic.
+# Зверніть увагу на термінологію, яку ми використовували тут:
+#   •	Ми зіставляємо змінні з естетикою, якщо хочемо, щоб візуальний атрибут, представлений цією естетикою, змінювався на основі значень цієї змінної.
+#   •	В іншому випадку ми встановлюємо значення естетики.
 
-# 🌈 4. КОЛЬОРОВІ КОМБІНАЦІЇ
-color_combinations <- c(
-  "red and blue" = "червоний і синій",
-  "green and yellow" = "зелений і жовтий"
-)
 
-# ✅ 5. ДОМАШНЄ ЗАВДАННЯ
-# Створити 3 графіки з різними кольорами
-# ---- color-practice-exercises -----------------------------------------
 
-# 📊 ЗАВДАННЯ 1: Червоні точки (Red points)
-ggplot(data = penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
-  geom_point(color = "red") + # RED POINTS
-  labs(title = "Red Penguins")
 
-# 📊 ЗАВДАННЯ 2: Сині точки (Blue points)
-ggplot(data = penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
-  geom_point(color = "blue") + # BLUE POINTS
-  labs(title = "Blue Penguins")
 
-# 📊 ЗАВДАННЯ 3: Зелені точки (Green points)
-ggplot(data = penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
-  geom_point(color = "green") + # GREEN POINTS
-  labs(title = "Green Penguins")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
