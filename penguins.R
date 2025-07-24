@@ -428,7 +428,7 @@ ggplot(penguins, aes(x = body_mass_g, color = species)) +
 ggplot(penguins, aes(x = body_mass_g, color = species, fill = species)) +
   geom_density(alpha = 0.5)
 
-# ⚠️⁉️ Note the terminology we have used here:
+# ⚠️ Note the terminology we have used here:
 #   •	We map variables to aesthetics if we want the visual attribute represented by that aesthetic to vary based on the values of that variable.
 #   •	Otherwise, we set the value of an aesthetic.
 # Зверніть увагу на термінологію, яку ми використовували тут:
