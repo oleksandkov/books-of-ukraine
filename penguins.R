@@ -434,17 +434,31 @@ ggplot(penguins, aes(x = body_mass_g, color = species, fill = species)) +
 # Зверніть увагу на термінологію, яку ми використовували тут:
 #   •	Ми зіставляємо змінні з естетикою, якщо хочемо, щоб візуальний атрибут, представлений цією естетикою, змінювався на основі значень цієї змінної.
 #   •	В іншому випадку ми встановлюємо значення естетики.
+### Two categorical variables
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar()
 
+# графік відносної частоти
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill")
 
+# Три або більше змінних
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = island))
+# to split your plot into facets
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = species)) +
+  facet_wrap(~island)
 
+### Вправи
+?mpg
+# 1. Які змінні в mpg є категорійними?
+# ✅  "type" of car, fuel type, drv, number of cylinders, 
+#year, displ, model, manufacturer, 
+# Які змінні в mpg є числовими?
+# ✅  "cty" (city miles per gallon), "hwy" (highway miles per gallon),
 
-
-
-
-
-
-
-
+# 2. Створіть графік розсіювання for highway mpg.
 
 
 
